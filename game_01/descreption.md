@@ -15,7 +15,8 @@
 فيديو الدرس
 -----------
 
-[![لعبة الذاكرة](https://img.youtube.com/vi/M0egyNvsN-Y&ab_channel=OnlineTutorials.jpg)](https://www.youtube.com/watch?v=M0egyNvsN-Y&pp=ygUWbWVtb3J5IGdhbWUgamF2YXNjcmlwdA%3D%3D)
+[![لعبة الذاكرة](https://img.youtube.com/vi/mohIQB_70Xk/maxresdefault.jpg
+)](https://www.youtube.com/watch?v=mohIQB_70Xk&pp=ygUWbWVtb3J5IGdhbWUgamF2YXNjcmlwdA%3D%3D)
 
 المتطلبات الأساسية
 ------------------
