@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Puzzle Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Number Puzzle Game</h1>
+        <div class="game-area">
+            <div class="puzzle" id="puzzle">
+                <!-- Puzzle tiles will be dynamically inserted here -->
+            </div>
+            <div class="controls">
+                <button id="btn" class="restart-btn">
+                    <i class="fas fa-redo"></i> Restart
+                </button>
+                <div class="stats">
+                    <p class="moves">Moves: <span id="moves">0</span></p>
+                    <p class="time">Time: <span id="times">00:00</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Puzzle Game</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #4a4af4;
+            --secondary-color: #f4a261;
+            --background-color: #1a1a1a;
+            --text-color: #ffffff;
+            --tile-color: #2a2a2a;
+            --tile-text-color: #ffffff;
+            --button-color: #4a4af4;
+            --button-hover-color: #3a3ad4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(74, 74, 244, 0.3);
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .puzzle {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1 / 1;
+        }
+
+        .box {
+            background-color: var(--tile-color);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--tile-text-color);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .box:not(:empty):hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(74, 74, 244, 0.5);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .restart-btn {
+            background-color: var(--button-color);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .restart-btn:hover {
+            background-color: var(--button-hover-color);
+            transform: scale(1.05);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .moves, .time {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+
+        @keyframes tileAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .box {
+            animation: tileAppear 0.5s ease-out;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 20px;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .puzzle {
+                gap: 5px;
+            }
+
+            .box {
+                font-size: 1.2rem;
+            }
+
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .moves, .time {
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-width: 350px) {
+            .container {
+                padding: 15px;
+            }
+
+            .title {
+                font-size: 1.8rem;
+            }
+
+            .box {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Number Puzzle Game</h1>
+        <div class="game-area">
+            <div class="puzzle" id="puzzle">
+                <!-- Puzzle tiles will be dynamically inserted here -->
+            </div>
+            <div class="controls">
+                <button id="btn" class="restart-btn">
+                    &#x21bb; Restart
+                </button>
+                <div class="stats">
+                    <p class="moves">Moves: <span id="moves">0</span></p>
+                    <p class="time">Time: <span id="times">00:00</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game variables
+        const puzzle = document.getElementById('puzzle');
+        const moves = document.getElementById('moves');
+        const times = document.getElementById('times');
+        const btn = document.getElementById('btn');
+
+        let moveCount = 0;
+        let totalTime = 0;
+        let timerInterval;
+
+        // Create array of numbers 1-15 and empty string
+        const numbers = Array.from({length: 15}, (_, i) => i + 1).concat('');
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Initialize the game
+        function initGame() {
+            moveCount = 0;
+            totalTime = 0;
+            moves.textContent = moveCount;
+            times.textContent = '00:00';
+
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+
+            const shuffled = shuffleArray([...numbers]);
+            puzzle.innerHTML = '';
+            shuffled.forEach(num => {
+                const box = document.createElement('span');
+                box.className = 'box';
+                box.textContent = num;
+                puzzle.appendChild(box);
+            });
+
+            startTimer();
+        }
+
+        // Start the timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                totalTime++;
+                const minutes = Math.floor(totalTime / 60).toString().padStart(2, '0');
+                const seconds = (totalTime % 60).toString().padStart(2, '0');
+                times.textContent = `${minutes}:${seconds}`;
+            }, 1000);
+        }
+
+        // Check if the puzzle is solved
+        function checkWin() {
+            const currentOrder = Array.from(puzzle.children).map(box => box.textContent);
+            return JSON.stringify(currentOrder) === JSON.stringify(numbers);
+        }
+
+        // Handle box click
+        puzzle.addEventListener('click', (e) => {
+            if (e.target.classList.contains('box')) {
+                const emptyBox = puzzle.querySelector('.box:empty');
+                const clickedBox = e.target;
+                const emptyIndex = Array.from(puzzle.children).indexOf(emptyBox);
+                const clickedIndex = Array.from(puzzle.children).indexOf(clickedBox);
+
+                if (
+                    (Math.abs(emptyIndex - clickedIndex) === 1 && Math.floor(emptyIndex / 4) === Math.floor(clickedIndex / 4)) ||
+                    Math.abs(emptyIndex - clickedIndex) === 4
+                ) {
+                    [emptyBox.textContent, clickedBox.textContent] = [clickedBox.textContent, emptyBox.textContent];
+                    moveCount++;
+                    moves.textContent = moveCount;
+
+                    if (checkWin()) {
+                        clearInterval(timerInterval);
+                        setTimeout(() => {
+                            alert(`Congratulations! You solved the puzzle in ${moveCount} moves and ${times.textContent} time.`);
+                        }, 100);
+                    }
+                }
+            }
+        });
+
+        // Initialize game on button click
+        btn.addEventListener('click', initGame);
+
+        // Initialize game on page load
+        initGame();
+    </script>
+</body>
+</html>
